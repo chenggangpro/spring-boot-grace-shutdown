@@ -1,0 +1,14 @@
+management:
+  server:
+    add-application-context-header: false
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: ALWAYS
+    shutdown:
+      enabled: true
+      shutdownTimeUnit: SECONDS
+      shutdownTime: 35
