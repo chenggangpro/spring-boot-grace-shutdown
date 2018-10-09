@@ -8,6 +8,7 @@ import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import pro.chenggang.springboot.actuator.endpoint.shutdown.grace.core.ShutdownHook;
+import pro.chenggang.springboot.actuator.endpoint.shutdown.grace.core.ShutdownJob;
 
 import java.util.Collections;
 import java.util.Map;
@@ -25,9 +26,7 @@ public class GraceShutdownEndpoint extends ShutdownEndpoint {
             .unmodifiableMap(
                     Collections.singletonMap("message", "No context to shutdown."));
 
-    private static final Map<String, String> SHUTDOWN_MESSAGE = Collections
-            .unmodifiableMap(
-                    Collections.singletonMap("message", "Shutting down, bye..."));
+    private static final String SHUTDOWN_MESSAGE = "Shutting down : Wait health check in %s(%s),Force shut down in %s(%s), bye...";
 
     private ConfigurableApplicationContext context;
 
@@ -37,6 +36,7 @@ public class GraceShutdownEndpoint extends ShutdownEndpoint {
     private TimeUnit shutdownTimeUnit = TimeUnit.SECONDS;
     private long healthWaitTime = 10L;
     private long shutdownTime;
+    private ShutdownJob shutdownJob;
 
     public GraceShutdownEndpoint(ShutdownHook shutdownHook,long shutdownTime) {
         this(shutdownHook,null, shutdownTime,null,-1);
@@ -74,7 +74,12 @@ public class GraceShutdownEndpoint extends ShutdownEndpoint {
             return NO_CONTEXT_MESSAGE;
         }
         try {
-            return SHUTDOWN_MESSAGE;
+            return Collections
+                    .singletonMap("message",String.format(SHUTDOWN_MESSAGE
+                            ,this.healthWaitTime
+                            ,this.healthWaitTimeUnit
+                            ,this.shutdownTime
+                            ,this.shutdownTimeUnit));
         } finally {
             final Thread thread = new Thread(() -> {
                 try {
@@ -85,6 +90,10 @@ public class GraceShutdownEndpoint extends ShutdownEndpoint {
                     this.shutdownHook.pauseRequest();
                     log.info("Grace Shutdown Progress Start Shutdown");
                     this.shutdownHook.shutdown(this.shutdownTime,this.shutdownTimeUnit);
+                    if(null != shutdownJob){
+                        log.info("Grace Shutdown Progress Execute Custom Shutdown Job ...");
+                        shutdownJob.executeShutdownJob();
+                    }
                     this.context.close();
                 } catch (final InterruptedException ex) {
                     log.error("Grace shutdownn progress has been interrupted :{} " ,ex.getMessage());
@@ -102,4 +111,7 @@ public class GraceShutdownEndpoint extends ShutdownEndpoint {
         }
     }
 
+    public void setShutdownJob(ShutdownJob shutdownJob) {
+        this.shutdownJob = shutdownJob;
+    }
 }

@@ -9,6 +9,8 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import pro.chenggang.springboot.actuator.endpoint.shutdown.grace.core.DefaultShutdownJob;
+import pro.chenggang.springboot.actuator.endpoint.shutdown.grace.core.ShutdownJob;
 import pro.chenggang.springboot.actuator.endpoint.shutdown.grace.core.TomcatShutdownHook;
 import pro.chenggang.springboot.actuator.endpoint.shutdown.grace.endpoint.GraceShutdownEndpoint;
 import pro.chenggang.springboot.actuator.endpoint.shutdown.grace.properties.GraceShutdownProperties;
@@ -29,6 +31,13 @@ public class GraceShutdownConfig {
     }
 
     @Bean
+    @ConditionalOnMissingBean(ShutdownJob.class)
+    public ShutdownJob shutdownJob(){
+        return new DefaultShutdownJob();
+    }
+
+
+    @Bean
     public TomcatShutdownHook tomcatShutdownHook() {
         TomcatShutdownHook tomcatShutdownHook =  new TomcatShutdownHook();
         log.info("Init TomcatShutdownHook Success");
@@ -43,13 +52,15 @@ public class GraceShutdownConfig {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    protected GraceShutdownEndpoint graceShutdownEndpoint(TomcatShutdownHook tomcatShutdownHook,GraceShutdownProperties graceShutdownPropertie) {
+    public GraceShutdownEndpoint graceShutdownEndpoint(TomcatShutdownHook tomcatShutdownHook,
+                                                          ShutdownJob shutdownJob,
+                                                          GraceShutdownProperties graceShutdownPropertie) {
         GraceShutdownEndpoint graceShutdownEndpoint =  new GraceShutdownEndpoint(tomcatShutdownHook
                 ,graceShutdownPropertie.getShutdownTimeUnit()
                 ,graceShutdownPropertie.getShutdownTime()
                 ,graceShutdownPropertie.getHealthWaitTimeUnit()
                 ,graceShutdownPropertie.getHealthWaitTime());
+        graceShutdownEndpoint.setShutdownJob(shutdownJob);
         log.info("Init GraceShutdownEndpoint Success");
         return graceShutdownEndpoint;
     }

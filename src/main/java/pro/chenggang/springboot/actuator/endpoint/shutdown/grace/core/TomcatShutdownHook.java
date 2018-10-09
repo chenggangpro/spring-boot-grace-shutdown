@@ -48,7 +48,6 @@ public class TomcatShutdownHook implements ShutdownHook,TomcatConnectorCustomize
         if (executor instanceof ThreadPoolExecutor) {
             final ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
             threadPoolExecutor.shutdown();
-
             if(!threadPoolExecutor.awaitTermination(delayTime, delayTimeUnit)) {
                 log.warn("Tomcat can not shutdown gracefully . Proceeding with force shutdown.DelayTime:{},DelayTimeUnit:{}",delayTime,delayTimeUnit);
             } else {

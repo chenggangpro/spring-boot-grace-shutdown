@@ -29,3 +29,4 @@ management:
 ```
 
 * 5 . 应用启动后请求接口`POST:/actuator/shutdown`即可
+* 6 . `ShutdownJob`接口提供一个方法,供在容器关闭前执行特定业务逻辑,可自定义实现类,并配置成Bean,在容器关闭前会自动加载执行
