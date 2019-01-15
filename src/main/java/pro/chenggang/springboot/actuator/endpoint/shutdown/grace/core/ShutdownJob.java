@@ -5,8 +5,13 @@ package pro.chenggang.springboot.actuator.endpoint.shutdown.grace.core;
  * @date 2018/10/9.
  */
 public interface ShutdownJob {
+
     /**
-     * 执行ShutdownJob
+     * 执行关闭tomcat线程池之前任务
      */
-    void executeShutdownJob();
+    void executeBeforeJob();
+    /**
+     * 执行关闭tomcat线程池之后任务
+     */
+    void executeAfterJob();
 }

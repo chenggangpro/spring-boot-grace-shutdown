@@ -88,11 +88,15 @@ public class GraceShutdownEndpoint extends ShutdownEndpoint {
                     this.healthWaitTimeUnit.sleep(this.healthWaitTime);
                     log.info("Grace Shutdown Progress Start Pause Request");
                     this.shutdownHook.pauseRequest();
+                    if(null != shutdownJob){
+                        log.info("Grace Shutdown Progress Execute Before Shutdown Job ...");
+                        shutdownJob.executeBeforeJob();
+                    }
                     log.info("Grace Shutdown Progress Start Shutdown");
                     this.shutdownHook.shutdown(this.shutdownTime,this.shutdownTimeUnit);
                     if(null != shutdownJob){
-                        log.info("Grace Shutdown Progress Execute Custom Shutdown Job ...");
-                        shutdownJob.executeShutdownJob();
+                        log.info("Grace Shutdown Progress Execute After Shutdown Job ...");
+                        shutdownJob.executeAfterJob();
                     }
                     this.context.close();
                 } catch (final InterruptedException ex) {

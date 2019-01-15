@@ -10,7 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 public class DefaultShutdownJob implements ShutdownJob {
 
     @Override
-    public void executeShutdownJob() {
-        log.info("Execute Default Shutdown Job,There Is nothing To do...");
+    public void executeBeforeJob() {
+        log.info("Execute Default Before Shutdown Job,There Is nothing To do...");
+    }
+
+    @Override
+    public void executeAfterJob() {
+        log.info("Execute Default After Shutdown Job,There Is nothing To do...");
     }
 }
