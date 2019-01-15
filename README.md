@@ -1,6 +1,9 @@
 # spring-boot-grace-shutdown
 
-## 此脚手架基于SpringBoot-2.0.5.RELEASE版本开发,1.5.X版本未测试
+注意事项：
+
+   * 1 .  此脚手架基于SpringBoot-2.0.5.RELEASE版本开发,1.5.X版本未测试
+   * 2 .  此方式依赖于`spring-boot-starter-actuator` 项目
 
 ## 使用方法
 
